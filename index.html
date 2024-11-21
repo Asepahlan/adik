@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kata-kata Semangat</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            animation: gradientShift 15s infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .music-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .music-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            animation: pulse 2s infinite;
+        }
+
+        .visualizer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .bar {
+            width: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            transition: height 0.1s ease;
+        }
+
+        .quote-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+            transform: perspective(1000px) rotateX(0deg);
+            transition: all 0.5s ease;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(2deg); }
+            75% { transform: translateY(20px) rotate(-2deg); }
+        }
+
+        .quote-text {
+            font-size: 3em;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            line-height: 1.5;
+        }
+
+        .particle-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            animation: particleFloat 3s linear infinite;
+            filter: blur(1px);
+        }
+
+        /* Tambahkan animasi yang lebih dinamis */
+        @keyframes particleFloat {
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(var(--moveX), var(--moveY)) rotate(180deg) scale(1.5);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translate(calc(var(--moveX) * 2), calc(var(--moveY) * 2)) rotate(360deg) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .quote-wrapper {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .quote-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+            animation: floatIn 1s ease-out;
+        }
+
+        .quote-text {
+            font-size: 2.5em;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.4;
+        }
+
+        .highlight {
+            color: #FFD700;
+            font-weight: bold;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Style untuk tombol navigasi */
+        .nav-buttons {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .nav-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Indikator slide */
+        .slide-indicators {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: white;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="music-controls">
+        <button class="music-btn" onclick="toggleMusic()">
+            <i class="fas fa-music"></i>
+        </button>
+    </div>
+
+    <div class="visualizer" id="visualizer"></div>
+    <div class="particle-container" id="particleContainer"></div>
+    <div id="slideContainer"></div>
+
+    <audio id="bgMusic" loop>
+        <source src="music/ssstik.io_1732185548901.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="quote-wrapper">
+        <div class="quote-box">
+            <h1 class="quote-text">
+                <span class="highlight">Ingatlah!</span>
+            </h1>
+            <p class="quote-text">
+                Setiap langkah kecil membawamu lebih dekat ke tujuan!
+            </p>
+        </div>
+    </div>
+
+    <!-- Tambahkan tombol navigasi -->
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="prevSlide()">
+            <i class="fas fa-arrow-left"></i> Sebelumnya
+        </button>
+        <button class="nav-btn" onclick="nextSlide()">
+            Selanjutnya <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <!-- Indikator slide -->
+    <div class="slide-indicators" id="slideIndicators"></div>
+
+    <script>
+        // Inisialisasi Audio Context untuk visualizer
+        let audioContext, analyser, dataArray;
+        const audio = document.getElementById('bgMusic');
+
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            analyser.fftSize = 256;
+            const bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+
+            // Buat bars untuk visualizer
+            const visualizer = document.getElementById('visualizer');
+            for(let i = 0; i < bufferLength; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                visualizer.appendChild(bar);
+            }
+        }
+
+        function updateVisualizer() {
+            if(!audioContext) return;
+            requestAnimationFrame(updateVisualizer);
+            
+            analyser.getByteFrequencyData(dataArray);
+            const bars = document.querySelectorAll('.bar');
+            
+            for(let i = 0; i < bars.length; i++) {
+                const height = dataArray[i] * 0.7;
+                bars[i].style.height = height + 'px';
+                bars[i].style.opacity = 0.5 + (height / 255);
+            }
+
+            // Update particle animation based on music
+            const particles = document.querySelectorAll('.particle');
+            const avgFrequency = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            particles.forEach(particle => {
+                particle.style.animationDuration = (3000 / (avgFrequency + 1)) + 'ms';
+            });
+        }
+
+        function toggleMusic() {
+            if(audio.paused) {
+                audio.play();
+                if(!audioContext) initAudio();
+                updateVisualizer();
+            } else {
+                audio.pause();
+            }
+        }
+
+        // Fungsi untuk membuat particle yang lebih menarik
+        function createEnhancedParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            // Random particle type
+            const particles = ['✨', '💫', '⭐', '🌟', '🎵', '🎶'];
+            particle.innerHTML = particles[Math.floor(Math.random() * particles.length)];
+            
+            // Random position and movement
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            
+            // Random movement direction
+            particle.style.setProperty('--moveX', (Math.random() - 0.5) * 300 + 'px');
+            particle.style.setProperty('--moveY', (Math.random() - 0.5) * 300 + 'px');
+            
+            // Random size
+            const size = Math.random() * 20 + 10;
+            particle.style.fontSize = size + 'px';
+            
+            document.getElementById('particleContainer').appendChild(particle);
+            setTimeout(() => particle.remove(), 3000);
+        }
+
+        // Create particles continuously
+        setInterval(createEnhancedParticle, 200);
+
+        // Tambahkan efek mouse trail
+        document.addEventListener('mousemove', (e) => {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.innerHTML = '✨';
+            particle.style.left = e.clientX + 'px';
+            particle.style.top = e.clientY + 'px';
+            document.getElementById('particleContainer').appendChild(particle);
+            setTimeout(() => particle.remove(), 1000);
+        });
+
+        // Tambahkan array quotes
+        const quotes = [
+            "Setiap langkah kecil membawamu lebih dekat ke tujuan!",
+            "Kegagalan adalah guru terbaik untuk kesuksesan!",
+            "Masa depan adalah milik mereka yang percaya pada mimpinya!",
+            "Jangan pernah menyerah, karena ada alasan kamu memulainya!",
+            "Kesuksesan dimulai dari mimpi yang berani!"
+        ];
+
+        let currentSlide = 0;
+        const totalSlides = quotes.length;
+
+        // Fungsi untuk membuat indikator
+        function createIndicators() {
+            const indicatorContainer = document.getElementById('slideIndicators');
+            for(let i = 0; i < totalSlides; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = `indicator ${i === 0 ? 'active' : ''}`;
+                indicator.onclick = () => goToSlide(i);
+                indicatorContainer.appendChild(indicator);
+            }
+        }
+
+        // Fungsi untuk mengganti slide
+        function changeSlide(direction) {
+            const quoteBox = document.querySelector('.quote-box');
+            quoteBox.style.opacity = 0;
+            
+            setTimeout(() => {
+                if(direction === 'next') {
+                    currentSlide = (currentSlide + 1) % totalSlides;
+                } else {
+                    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                }
+                
+                updateQuote();
+                updateIndicators();
+                quoteBox.style.opacity = 1;
+            }, 500);
+        }
+
+        function nextSlide() {
+            changeSlide('next');
+        }
+
+        function prevSlide() {
+            changeSlide('prev');
+        }
+
+        function goToSlide(index) {
+            const quoteBox = document.querySelector('.quote-box');
+            quoteBox.style.opacity = 0;
+            
+            setTimeout(() => {
+                currentSlide = index;
+                updateQuote();
+                updateIndicators();
+                quoteBox.style.opacity = 1;
+            }, 500);
+        }
+
+        function updateQuote() {
+            const quoteText = document.querySelector('.quote-text:last-child');
+            quoteText.textContent = quotes[currentSlide];
+        }
+
+        function updateIndicators() {
+            const indicators = document.querySelectorAll('.indicator');
+            indicators.forEach((indicator, index) => {
+                if(index === currentSlide) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+        }
+
+        // Inisialisasi
+        createIndicators();
+
+        // Tambahkan keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowRight') {
+                nextSlide();
+            } else if(e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+    </script>
+
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</body>
+</html>

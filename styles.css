@@ -1,0 +1,21 @@
+/* Animasi untuk teks yang mengikuti musik */
+.music-reactive-text {
+    animation: textPulse 0.5s infinite;
+    transform-origin: center;
+}
+
+@keyframes textPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Efek glow yang berubah mengikuti musik */
+.glow {
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.7));
+    animation: glowPulse 1s infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(255,255,255,0.7)); }
+    50% { filter: drop-shadow(0 0 20px rgba(255,255,255,0.9)); }
+} 
