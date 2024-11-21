@@ -7,9 +7,46 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            background: linear-gradient(45deg, #2c3e50, #3498db);
             font-family: 'Arial', sans-serif;
             overflow: hidden;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        /* Animasi background yang lebih dramatis */
+        @keyframes gradientBG {
+            0% {
+                background: linear-gradient(45deg, #2c3e50, #3498db);
+            }
+            50% {
+                background: linear-gradient(45deg, #2c3e50, #e74c3c);
+            }
+            100% {
+                background: linear-gradient(45deg, #2c3e50, #3498db);
+            }
+        }
+
+        /* Efek hujan digital */
+        .rain {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .drop {
+            position: absolute;
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(transparent, rgba(255,255,255,0.3));
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
         }
 
         .quote-container {
@@ -19,13 +56,20 @@
             transform: translate(-50%, -50%);
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 2rem;
+            padding: 3rem;
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             text-align: center;
             width: 80%;
             max-width: 800px;
             z-index: 10;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Animasi mengambang yang lebih halus */
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%); }
+            50% { transform: translate(-50%, -55%); }
         }
 
         .quote-text {
@@ -34,13 +78,67 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             margin: 0;
             padding: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .highlight {
             color: #FFD700;
             font-weight: bold;
             display: inline-block;
-            animation: pulse 2s infinite;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700; }
+            50% { text-shadow: 0 0 20px #FFD700, 0 0 30px #FFD700; }
+        }
+
+        /* Efek cahaya di sekitar container */
+        .quote-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #fff, transparent, #fff);
+            z-index: -1;
+            border-radius: 22px;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Style untuk tombol yang lebih dramatis */
+        .nav-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.5s ease;
+            animation: buttonPulse 2s infinite;
+        }
+
+        @keyframes buttonPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0); }
         }
 
         .navigation {
@@ -51,23 +149,6 @@
             display: flex;
             gap: 20px;
             z-index: 100;
-        }
-
-        .nav-btn {
-            padding: 15px 30px;
-            font-size: 1.2em;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 30px;
-            color: white;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s ease;
-        }
-
-        .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-5px);
         }
 
         .music-control {
@@ -107,15 +188,12 @@
             color: white;
             font-size: 14px;
         }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
     </style>
 </head>
 <body>
+    <!-- Efek hujan digital -->
+    <div class="rain" id="rain"></div>
+
     <!-- Container untuk kata-kata motivasi -->
     <div class="quote-container">
         <h1 class="quote-text">
@@ -162,10 +240,14 @@
         const btnIcon = playBtn.querySelector('i');
 
         function showQuote(index) {
-            motivationText.style.opacity = 0;
+            const quote = document.getElementById('motivationText');
+            quote.style.opacity = 0;
+            quote.style.transform = 'translateY(20px)';
+            
             setTimeout(() => {
-                motivationText.textContent = quotes[index];
-                motivationText.style.opacity = 1;
+                quote.textContent = quotes[index];
+                quote.style.opacity = 1;
+                quote.style.transform = 'translateY(0)';
             }, 500);
         }
 
@@ -203,6 +285,33 @@
 
         // Ganti quote otomatis setiap 5 detik
         setInterval(nextQuote, 5000);
+
+        // Tambahan script untuk efek hujan
+        function createRain() {
+            const rain = document.getElementById('rain');
+            const dropCount = 50;
+
+            for(let i = 0; i < dropCount; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'drop';
+                drop.style.left = Math.random() * 100 + '%';
+                drop.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                drop.style.opacity = Math.random();
+                rain.appendChild(drop);
+            }
+        }
+
+        createRain();
+
+        // Tambahkan efek blur saat hover pada tombol
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('mouseover', () => {
+                document.querySelector('.quote-container').style.filter = 'blur(3px)';
+            });
+            btn.addEventListener('mouseout', () => {
+                document.querySelector('.quote-container').style.filter = 'blur(0)';
+            });
+        });
     </script>
 
     <!-- Font Awesome untuk ikon -->
