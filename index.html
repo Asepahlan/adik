@@ -228,6 +228,93 @@
             background: white;
             transform: scale(1.2);
         }
+
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .music-info {
+            text-align: center;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        #songTitle {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        #artistName {
+            font-size: 0.9em;
+            opacity: 0.8;
+            display: block;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .progress-container {
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .progress {
+            background: white;
+            height: 100%;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 0.8em;
+        }
     </style>
 </head>
 <body>
@@ -268,6 +355,33 @@
 
     <!-- Indikator slide -->
     <div class="slide-indicators" id="slideIndicators"></div>
+
+    <div class="music-player">
+        <div class="music-info">
+            <span id="songTitle">Judul Lagu</span>
+            <span id="artistName">Nama Artis</span>
+        </div>
+        <div class="controls">
+            <button onclick="prevSong()" class="control-btn">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <button onclick="toggleMusic()" class="play-btn control-btn">
+                <i class="fas fa-pause"></i>
+            </button>
+            <button onclick="nextSong()" class="control-btn">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <div class="time-info">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Inisialisasi Audio Context untuk visualizer
@@ -452,6 +566,127 @@
             } else if(e.key === 'ArrowLeft') {
                 prevSlide();
             }
+        });
+
+        // Daftar lagu motivasi Indonesia
+        const playlist = [
+            {
+                title: "Laskar Pelangi",
+                artist: "Nidji",
+                file: "musik/laskar-pelangi.mp3"
+            },
+            {
+                title: "Meraih Mimpi",
+                artist: "Maudy Ayunda",
+                file: "musik/meraih-mimpi.mp3"
+            },
+            {
+                title: "Sang Juara",
+                artist: "Vina Panduwinata",
+                file: "musik/sang-juara.mp3"
+            },
+            {
+                title: "Maju Tak Gentar",
+                artist: "Instrumental",
+                file: "musik/maju-tak-gentar.mp3"
+            }
+        ];
+
+        let currentSongIndex = 0;
+        const audio = new Audio();
+        audio.volume = 0.5; // Set volume awal ke 50%
+
+        // Fungsi untuk memuat dan memainkan lagu
+        function loadAndPlaySong(index) {
+            const song = playlist[index];
+            audio.src = song.file;
+            audio.load();
+            
+            // Janji untuk memainkan musik
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Autoplay berhasil
+                    updatePlayButton(false);
+                    updateSongInfo(song);
+                })
+                .catch(error => {
+                    // Autoplay diblokir
+                    console.log("Autoplay prevented:", error);
+                    updatePlayButton(true);
+                });
+            }
+        }
+
+        // Update informasi lagu
+        function updateSongInfo(song) {
+            document.getElementById('songTitle').textContent = song.title;
+            document.getElementById('artistName').textContent = song.artist;
+        }
+
+        // Update tombol play/pause
+        function updatePlayButton(isPaused) {
+            const icon = document.querySelector('.play-btn i');
+            icon.className = isPaused ? 'fas fa-play' : 'fas fa-pause';
+        }
+
+        // Toggle play/pause
+        function toggleMusic() {
+            if (audio.paused) {
+                audio.play();
+                updatePlayButton(false);
+            } else {
+                audio.pause();
+                updatePlayButton(true);
+            }
+        }
+
+        // Lagu berikutnya
+        function nextSong() {
+            currentSongIndex = (currentSongIndex + 1) % playlist.length;
+            loadAndPlaySong(currentSongIndex);
+        }
+
+        // Lagu sebelumnya
+        function prevSong() {
+            currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+            loadAndPlaySong(currentSongIndex);
+        }
+
+        // Update progress bar dan waktu
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            document.querySelector('.progress').style.width = `${progress}%`;
+            
+            // Update waktu
+            document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+            document.getElementById('duration').textContent = formatTime(audio.duration);
+        });
+
+        // Format waktu ke MM:SS
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Otomatis mainkan lagu berikutnya ketika selesai
+        audio.addEventListener('ended', () => {
+            nextSong();
+        });
+
+        // Mulai autoplay saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAndPlaySong(currentSongIndex);
+        });
+
+        // Handle klik pada progress bar
+        document.querySelector('.progress-bar').addEventListener('click', (e) => {
+            const progressBar = e.currentTarget;
+            const clickPosition = e.offsetX / progressBar.offsetWidth;
+            audio.currentTime = clickPosition * audio.duration;
         });
     </script>
 
